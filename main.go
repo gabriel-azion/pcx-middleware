@@ -17,61 +17,6 @@ const (
 	colorReset  = "\033[0m"
 )
 
-//  Get the input informed by the user
-func getInput(prompt string) string {
-	fmt.Print(prompt)
-	scanner := bufio.NewScanner(os.Stdin)
-	scanner.Scan()
-	return scanner.Text()
-}
-
-// Open the file
-func openFile(filePath string) (*os.File, error) {
-	file, err := os.Open(filePath)
-	if err != nil {
-		return nil, err
-	}
-	return file, nil
-}
-
-// Read the content inside the file (.mdx)
-func readFileContent(file *os.File) ([]byte, error) {
-	stat, err := file.Stat()
-	if err != nil {
-		return nil, err
-	}
-	content := make([]byte, stat.Size())
-	_, err = file.Read(content)
-	if err != nil {
-		return nil, err
-	}
-	return content, nil
-}
-
-// Find mathches by the pattern (regex) informed
-func findMatches(text, pattern string) []string {
-	re := regexp.MustCompile(pattern)
-	return re.FindAllString(text, -1)
-}
-
-// Format the URL adding the host
-func formatURL(url string) string {
-	if !strings.HasSuffix(url, "/") {
-		url += "/"
-	}
-	return "https://www.azion.com" + url
-}
-
-// Check if the link is working
-func checkURL(link string) (int, error) {
-	resp, err := http.Get(link)
-	if err != nil {
-		return 0, err
-	}
-	defer resp.Body.Close()
-	return resp.StatusCode, nil
-}
-
 func main() {
 	filePath := getInput("Inform the filepath to the docs you want to check: ")
 	file, err := openFile(filePath)
@@ -124,4 +69,59 @@ func main() {
 
 		fmt.Println(color, "Link:", link, "- Status Code:", statusCode, colorReset)
 	}
+}
+
+// Get the input informed by the user
+func getInput(prompt string) string {
+	fmt.Print(prompt)
+	scanner := bufio.NewScanner(os.Stdin)
+	scanner.Scan()
+	return scanner.Text()
+}
+
+// Open the file
+func openFile(filePath string) (*os.File, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return nil, err
+	}
+	return file, nil
+}
+
+// Read the content inside the file (.mdx)
+func readFileContent(file *os.File) ([]byte, error) {
+	stat, err := file.Stat()
+	if err != nil {
+		return nil, err
+	}
+	content := make([]byte, stat.Size())
+	_, err = file.Read(content)
+	if err != nil {
+		return nil, err
+	}
+	return content, nil
+}
+
+// Find mathches by the pattern (regex) informed
+func findMatches(text, pattern string) []string {
+	re := regexp.MustCompile(pattern)
+	return re.FindAllString(text, -1)
+}
+
+// Format the URL adding the host
+func formatURL(url string) string {
+	if !strings.HasSuffix(url, "/") {
+		url += "/"
+	}
+	return "https://www.azion.com" + url
+}
+
+// Check if the link is working
+func checkURL(link string) (int, error) {
+	resp, err := http.Get(link)
+	if err != nil {
+		return 0, err
+	}
+	defer resp.Body.Close()
+	return resp.StatusCode, nil
 }
