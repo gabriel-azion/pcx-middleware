@@ -49,7 +49,11 @@ func main() {
 
 		x := strings.Split(matches[i], "](")
 		y := strings.Replace(x[1], ")", "", -1)
-		y = formatURL(y)
+
+		if strings.Contains(y, "en/") || strings.Contains(y, "pt/") || strings.Contains(y, "pt-br/") {
+			y = formatURL(y)
+
+		}
 		matches[i] = y
 
 	}
@@ -57,6 +61,11 @@ func main() {
 	for i := range matchesButton {
 		x := strings.Replace(matchesButton[i], `href="`, "", -1)
 		x = strings.ReplaceAll(x, "\"", "")
+
+		if strings.Contains(x, "en/") || strings.Contains(x, "pt/") || strings.Contains(x, "pt-br/") {
+			x = formatURL(x)
+
+		}
 		x = formatURL(x)
 		matchesButton[i] = x
 
