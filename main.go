@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+
 	"regexp"
 	"strings"
 )
@@ -34,25 +35,36 @@ func main() {
 
 	text := string(content)
 
+	fmt.Println("\nScanning for typos powered by gpt-4")
+
 	urlPatternHttps := `https?://[^\s()]+`
-	urlPatternEN := `/en/documentation/products/[^\s/()]+(/[^/\s/()]+)*`
-	urlPatternPT := `/pt-br/documentacao/produtos/[^\s/()]+(/[^/\s/()]+)*`
+	generalUrlsPattnern := `\[(.*?)\]\((.*?)\)`
+	buttonMatches := `href="([^"]+)"`
 
 	matchesHttp := findMatches(text, urlPatternHttps)
-	matchesEN := findMatches(text, urlPatternEN)
-	matchesPT := findMatches(text, urlPatternPT)
+	matches := findMatches(text, generalUrlsPattnern)
+	matchesButton := findMatches(text, buttonMatches)
 
-	for i := range matchesEN {
-		matchesEN[i] = formatURL(matchesEN[i])
+	for i := range matches {
+
+		x := strings.Split(matches[i], "](")
+		y := strings.Replace(x[1], ")", "", -1)
+		y = formatURL(y)
+		matches[i] = y
+
 	}
 
-	for i := range matchesPT {
-		matchesPT[i] = formatURL(matchesPT[i])
+	for i := range matchesButton {
+		x := strings.Replace(matchesButton[i], `href="`, "", -1)
+		x = strings.ReplaceAll(x, "\"", "")
+		x = formatURL(x)
+		matchesButton[i] = x
+
 	}
 
-	allURLs := append(matchesEN, append(matchesHttp, matchesPT...)...)
+	allURLs := append(matches, append(matchesHttp, matchesButton...)...)
 
-	fmt.Println("Testing links")
+	fmt.Println("\nTesting links")
 	for _, link := range allURLs {
 		statusCode, err := checkURL(link)
 		if err != nil {
